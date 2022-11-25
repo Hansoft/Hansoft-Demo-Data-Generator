@@ -19,4 +19,5 @@ A fast way to generate Hansoft demo data for up to 1,000 users, groups and proje
 ## Quick Start
 
 * Download and install the dependencies
-* Modify 
+* Modify the top part of demodatagenerator.py with your login details
+* Run `python3 demodatagenerator.py` and follow the instructions.
