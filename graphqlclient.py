@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-""" An example of how to use Hansoft's GraphQL API
-
-Depends on:
--- qlient v. 1.0.0
-"""
 import requests
 
 from qlient.http import HTTPClient
@@ -16,7 +10,7 @@ class HansoftGraphQLClient():
 			print("Could not login")
 			return
 		self.setupAuthenticatedClient()
-			
+
 	def login(self, user, password):
 		query = """mutation login($loginCredentials:LoginUserInput!){
 		  login(loginUserInput:$loginCredentials){
@@ -28,7 +22,7 @@ class HansoftGraphQLClient():
 		    'username': user,
 		    'password': password
 		  }}
-		  
+
 		try:
 			r = requests.post(self.url, json={'query': query, 'variables':variables})
 			r.raise_for_status()
@@ -43,7 +37,7 @@ class HansoftGraphQLClient():
 
 		self.token = json["data"]["login"]["access_token"]	
 		return True
-		
+
 	def setupBasicClient(self):
 		self.client = HTTPClient(self.url)
 
@@ -55,14 +49,14 @@ class HansoftGraphQLClient():
 	"""
 	List
 	"""
-		
+
 	def listUsers(self):
 		response = self.client.query.users(["name"])
 		users = []
 		for p in response.data["users"]:
 			users.append(p["name"])
 		return users
-		
+
 	def listGroups(self):
 		response = self.client.query.userGroups(["name"])
 		groups = []
@@ -76,14 +70,14 @@ class HansoftGraphQLClient():
 		for p in response.data["projects"]:
 			projects.append(p["name"])
 		return projects
-		
+
 	""""
 	Create
 	"""
-		
+
 	def createProject(self, name):
-		projectPropertiesInput = {"name": name}
-		r = self.client.mutation.createProject(projectPropertiesInput=projectPropertiesInput, _fields=["id", "name"])
+		createProjectInput = {"name": name}
+		r = self.client.mutation.createProject(createProjectInput=createProjectInput, _fields=["id", "name"])
 		if r.errors:
 			if r.errors[0]["message"] == "Project with that name already exists":
 				return -1
@@ -94,10 +88,10 @@ class HansoftGraphQLClient():
 				return 0
 		else:
 			return r.data["createProject"]["id"]
-		
+
 	def createNormalUser(self, name):
-		userPropertiesInput = {"name": name, "password": "hpmadm"}
-		r = self.client.mutation.createNormalUser(userPropertiesInput=userPropertiesInput, _fields=["id", "name"])
+		createNormalUserInput = {"name": name, "password": "hpmadm"}
+		r = self.client.mutation.createNormalUser(createNormalUserInput=createNormalUserInput, _fields=["id", "name"])
 		if r.errors:
 			if r.errors[0]["message"] == "User with that name already exists":
 				return -1
@@ -111,8 +105,8 @@ class HansoftGraphQLClient():
 			return r.data["createNormalUser"]["id"]
 
 	def createUserGroup(self, name):
-		userGroupInput = {"name": name}
-		r = self.client.mutation.createUserGroup(userGroupInput=userGroupInput, _fields=["id", "name"])
+		createUGroupInput = {"name": name}
+		r = self.client.mutation.createUserGroup(createUserGroupInput=createUGroupInput, _fields=["id", "name"])
 		if r.errors:
 			if r.errors[0]["message"] == "User group with that name already exists":
 				return -1
@@ -123,13 +117,13 @@ class HansoftGraphQLClient():
 				return 0
 		else:
 			return r.data["createUserGroup"]["id"]
-			
+
 	"""
 	Update
 	"""
 	def enableLogin(self, user_id):
-		userPropertiesInput = {"id": user_id, "accessRights": {"isActiveAccount": True, "documentManagement": True, "dashboards": True, "dashboardPageShare": True, "avatarManagement": True}}
-		r = self.client.mutation.updateNormalUser(userPropertiesInput=userPropertiesInput, _fields=["id", "name"])
+		updateNormalUserInput = {"id": user_id, "accessRights": {"isActiveAccount": True, "documentManagement": True, "dashboards": True, "dashboardPageShare": True, "avatarManagement": True}}
+		r = self.client.mutation.updateNormalUser(updateNormalUserInput=updateNormalUserInput, _fields=["id", "name"])
 		if r.errors:
 			print(r.request.query)
 			print(r.request.variables)
@@ -139,8 +133,8 @@ class HansoftGraphQLClient():
 			return r.data["updateNormalUser"]["id"]
 
 	def enableAdmin(self, user_id):
-		userPropertiesInput = {"id": user_id, "accessRights": {"admin": True, "portfolioAllocation": True}}
-		r = self.client.mutation.updateNormalUser(userPropertiesInput=userPropertiesInput, _fields=["id", "name"])
+		updateNormalUserInput = {"id": user_id, "accessRights": {"admin": True, "portfolioAllocation": True}}
+		r = self.client.mutation.updateNormalUser(updateNormalUserInput=updateNormalUserInput, _fields=["id", "name"])
 		if r.errors:
 			print(r.request.query)
 			print(r.request.variables)
@@ -158,17 +152,17 @@ class HansoftGraphQLClient():
 			print(r.errors)
 		else:
 			return r.data["updateUserGroup"]["id"]
-			
+	
 	def addUsersToGroup(self, group_id, user_list):
-		userGroupInput = {"id": group_id, "userIDs": user_list}
-		r = self.client.mutation.updateUserGroup(userGroupInput=userGroupInput, _fields=["id", "name"])
+		updateUserGroupInput = {"id": group_id, "userIDs": user_list}
+		r = self.client.mutation.updateUserGroup(updateUserGroupInput=updateUserGroupInput, _fields=["id", "name"])
 		if r.errors:
 			print(r.request.query)
 			print(r.request.variables)
 			print(r.errors)
 		else:
 			return r.data["updateUserGroup"]["id"]
-			
+
 	def addUserToProject(self, project_id, user_id):
 		r = self.client.mutation.addProjectUser(projectID=project_id, userID=user_id, _fields=["id", "name"])
 		if r.errors:
@@ -176,8 +170,17 @@ class HansoftGraphQLClient():
 			print(r.request.variables)
 			print(r.errors)
 		else:
-			return r.data["addProjectUser"]["id"]	
-			
+			return r.data["addProjectUser"]["id"]
+
+	def addGroupToProject(self, project_id, group_id):
+		r = self.client.mutation.addProjectUserGroup(projectID=project_id, userGroupID=group_id, _fields=["id", "name"])
+		if r.errors:
+			print(r.request.query)
+			print(r.request.variables)
+			print(r.errors)
+		else:
+			return r.data["addProjectUserGroup"]["id"]	
+
 	def enableMainManager(self, project_id, user_id):
 		accessRights = {"isMainManager": True, "canAccessProjectHistory": True}
 		r = self.client.mutation.updateProjectUserAccessRights(projectID=project_id, userID=user_id, accessRights=accessRights)
