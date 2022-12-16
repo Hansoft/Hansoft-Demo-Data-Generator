@@ -11,9 +11,9 @@ A fast way to generate Hansoft demo data for up to 1,000 users, groups and proje
 ## Dependencies
 
 * Python 3.8
-* [Hansoft Server 11.1 or later](https://www.perforce.com/downloads/hansoft-server)
-* Access to the SDK
-* Hansoft SDK and GraphQL API
+* [Hansoft Server 11.1004 or later](https://www.perforce.com/downloads/hansoft-server)
+* Access to the Hansoft SDK (requires a license key)
+* [Hansoft SDK](https://www.perforce.com/downloads/hansoft-sdk) and [Hansoft API](https://www.perforce.com/downloads/hansoft-api)
 * [Qlient: Python GraphQL Client](https://github.com/qlient-org/python-qlient)
 
 ## Quick Start
